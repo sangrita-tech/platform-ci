@@ -6,9 +6,6 @@ on:
       service:
         required: true
         type: string
-      image:
-        required: true
-        type: string
 
 permissions:
   contents: read
@@ -62,7 +59,7 @@ jobs:
           file: cmd/${{ inputs.service }}/Dockerfile
           push: true
           platforms: linux/amd64
-          tags: ${{ inputs.image }}:${{ steps.ver.outputs.imagetag }}
+          tags: ghcr.io/${{ github.repository_owner }}/${{ inputs.service }}:${{ steps.ver.outputs.imagetag }}
 
           build-args: |
             SERVICE=${{ inputs.service }}
