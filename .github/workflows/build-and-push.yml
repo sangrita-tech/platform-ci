@@ -45,12 +45,14 @@ jobs:
       - name: Compute tag + VERSION for ldflags
         id: ver
         run: |
+          SHORT="${{ steps.sha.outputs.short }}"
+
           if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
-            echo "imagetag=tag-${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+            echo "imagetag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
             echo "version=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
           else
-            echo "imagetag=commit-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
-            echo "version=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+            echo "imagetag=commit-${SHORT}" >> "$GITHUB_OUTPUT"
+            echo "version=commit-${SHORT}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Build and push
@@ -59,13 +61,13 @@ jobs:
           context: .
           file: cmd/${{ inputs.service }}/Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: ${{ inputs.image }}:${{ steps.ver.outputs.imagetag }}
 
           build-args: |
             SERVICE=${{ inputs.service }}
             VERSION=${{ steps.ver.outputs.version }}
-            COMMIT=${{ github.sha }}
+            COMMIT=${{ steps.sha.outputs.short }}
             DATE=${{ steps.builddate.outputs.date }}
 
           cache-from: type=gha
