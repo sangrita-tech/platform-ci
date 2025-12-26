@@ -1,0 +1,33 @@
+name: Release
+
+on:
+  workflow_call:
+
+permissions:
+  contents: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure we are on a tag
+        run: |
+          if [ "${{ github.ref_type }}" != "tag" ]; then
+            echo "This workflow must be called from a tag ref."
+            echo "github.ref_type=${{ github.ref_type }}"
+            exit 1
+          fi
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
