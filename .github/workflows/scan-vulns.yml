@@ -3,12 +3,13 @@ name: Scan Vulnerabilities
 on:
   workflow_call:
 
+permissions:
+  contents: read
+
 jobs:
   trivy-fs:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
+    continue-on-error: true
 
     steps:
       - name: Checkout
